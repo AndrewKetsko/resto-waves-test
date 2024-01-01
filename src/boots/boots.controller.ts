@@ -6,6 +6,7 @@ import {
   ParseIntPipe,
   Patch,
   Query,
+  ValidationPipe,
 } from '@nestjs/common';
 import { BootsService } from './boots.service';
 import { EditNameDto } from './dtos/editName.dto';
@@ -30,7 +31,10 @@ export class BootsController {
   }
 
   @Patch(':id')
-  editName(@Param('id', ParseIntPipe) id: number, @Body() body: EditNameDto) {
+  editName(
+    @Param('id', ParseIntPipe) id: number,
+    @Body(ValidationPipe) body: EditNameDto,
+  ) {
     return this.bootsService.editName(id, body);
   }
 }

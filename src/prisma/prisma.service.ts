@@ -22,8 +22,14 @@ export class PrismaService extends PrismaClient {
     return this.boot.findMany();
   }
 
-  getOne(id: number) {
-    return this.boot.findFirst({ where: { id } });
+  async getOne(id: number) {
+    const data = await this.boot.findFirst({ where: { id } });
+
+    if (!data) {
+      throw new BadRequestException();
+    }
+
+    return data;
   }
 
   getByDimension(dimension: number) {

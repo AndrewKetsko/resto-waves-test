@@ -29,7 +29,7 @@ export class BootsService {
     return this.prismaService.getOne(id);
   }
 
-  getByDimension(dimension: string) {
+  getByDimension(dimension: number) {
     return this.prismaService.getByDimension(dimension);
   }
 

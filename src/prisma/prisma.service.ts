@@ -13,10 +13,6 @@ export class PrismaService extends PrismaClient {
     });
   }
 
-  // cleanDb() {
-  //   return this.$transaction([this.boot.deleteMany()]);
-  // }
-
   async hydrateDb(data) {
     await this.boot.deleteMany();
     await this.boot.createMany({ data });
@@ -30,10 +26,10 @@ export class PrismaService extends PrismaClient {
     return this.boot.findFirst({ where: { id } });
   }
 
-  getByDimension(dimension: string) {
+  getByDimension(dimension: number) {
     return this.boot.findMany({
       where: {
-        dimensions: { has: 39 },
+        dimensions: { has: dimension },
       },
     });
   }

@@ -10,6 +10,7 @@ export const enums = {
 
 @Injectable()
 export class GoogleService {
+  private list: any[] = [];
   constructor(private prismaService: PrismaService) {}
 
   async getSpreadsheetsFirst() {
@@ -19,47 +20,28 @@ export class GoogleService {
 
     await doc.loadInfo();
     const list = [];
+    doc.sheetsByIndex.map(async (sheet, ind, arr) => {
+      const dataArr = async () => await sheet.getCellsInRange('A4:K30');
+      const data = await dataArr();
+      data.splice(3, 1);
 
-    doc.sheetsByIndex.forEach(async (sheet, ind, arr) => {
-      const dataArr = await sheet.getCellsInRange('A4:K30');
-      dataArr.splice(3, 1);
-      console.log(dataArr);
-
-      for (let i = 1; i < dataArr[0].length; i++) {
+      for (let i = 1; i < data[0].length; i++) {
         const element: any = {};
         element.model = sheet.title;
-
-        dataArr.forEach((el) => {
-          element[el[0].trim()] =
-            el[i] === undefined || el[i] === ''
-              ? false
-              : el[i] === '+'
-                ? true
-                : el[i];
+        element.dimensions = [];
+        data.forEach((el: any) => {
+          if (typeof +el[0] === 'number' && !isNaN(+el[0])) {
+            if (el[i] === '+') element.dimensions.push(+el[0]);
+          } else {
+            element[enums[el[0].trim()]] = el[i];
+          }
         });
         list.push(element);
       }
       if (ind === arr.length - 1) {
-        console.log(list);
-
-        const data = list.map((e) => {
-          const keys = Object.keys(e);
-          const dimensions = keys.filter((key) => {
-            if (typeof +key === 'number' && e[key] === true) {
-              return +key;
-            }
-          });
-          return {
-            model: e.model,
-            name: e['Імя'],
-            price: e['Ціна'],
-            code: e['Код товару'],
-            dimensions,
-          };
-        });
-        console.log(data);
+        this.prismaService.hydrateDb(list);
       }
     });
-    return { list };
+    return { message: 'done' };
   }
 }

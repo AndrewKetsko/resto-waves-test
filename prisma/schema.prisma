@@ -12,7 +12,7 @@ model Boot{
 
     model String
     name String
-    price Int
-    code Int
+    price String
+    code String
     dimensions Int[]
 }

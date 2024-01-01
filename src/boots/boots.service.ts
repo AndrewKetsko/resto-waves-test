@@ -1,19 +1,39 @@
 import { Injectable } from '@nestjs/common';
 import { Cron, CronExpression, Timeout } from '@nestjs/schedule';
 import { GoogleService } from './google.service';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { EditNameDto } from './dtos/editName.dto';
 
 @Injectable()
 export class BootsService {
-  constructor(private googleService: GoogleService) {}
+  constructor(
+    private googleService: GoogleService,
+    private prismaService: PrismaService,
+  ) {}
 
-  @Timeout(1000)
+  @Timeout(0)
   async getSpreadsheetsFirst() {
-    const obj = await this.googleService.getSpreadsheetsFirst();
-    console.log(obj);
+    await this.googleService.getSpreadsheetsFirst();
   }
 
   @Cron(CronExpression.EVERY_HOUR)
-  getSpreadsheets() {
-    console.log('1 hour');
+  async getSpreadsheets() {
+    await this.googleService.getSpreadsheetsFirst();
+  }
+
+  getAll() {
+    return this.prismaService.getAll();
+  }
+
+  getOne(id: number) {
+    return this.prismaService.getOne(id);
+  }
+
+  getByDimension(dimension: string) {
+    return this.prismaService.getByDimension(dimension);
+  }
+
+  editName(id: number, body: EditNameDto) {
+    return this.prismaService.editName(id, body);
   }
 }

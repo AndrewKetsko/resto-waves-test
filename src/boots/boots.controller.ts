@@ -21,7 +21,7 @@ export class BootsController {
   }
 
   @Get('/dimension')
-  getByDimension(@Query('dimension', ParseIntPipe) dimension: number) {
+  getByDimension(@Query('dimension') dimension: string) {
     return this.bootsService.getByDimension(dimension);
   }
 

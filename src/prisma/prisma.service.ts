@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaClient } from '@prisma/client';
 import { EditNameDto } from 'src/boots/dtos/editName.dto';
+import { BootInterface } from 'src/boots/interfaces/boot.interface';
 
 @Injectable()
 export class PrismaService extends PrismaClient {
@@ -13,17 +14,27 @@ export class PrismaService extends PrismaClient {
     });
   }
 
-  async hydrateDb(data) {
-    await this.boot.deleteMany();
-    await this.boot.createMany({ data });
+  async hydrateDb(data: BootInterface[]): Promise<void> {
+    const list: BootInterface[] = await this.getAll();
+    if (list.length > 0) {
+      data.forEach(async (element: BootInterface) => {
+        await this.boot.upsert({
+          where: { name: element.name },
+          update: { dimensions: element.dimensions },
+          create: { ...element },
+        });
+      });
+    } else {
+      await this.boot.createMany({ data });
+    }
   }
 
-  getAll() {
+  getAll(): Promise<BootInterface[]> {
     return this.boot.findMany();
   }
 
-  async getOne(id: number) {
-    const data = await this.boot.findFirst({ where: { id } });
+  async getOne(id: number): Promise<BootInterface> {
+    const data: BootInterface = await this.boot.findFirst({ where: { id } });
 
     if (!data) {
       throw new BadRequestException();
@@ -32,7 +43,7 @@ export class PrismaService extends PrismaClient {
     return data;
   }
 
-  getByDimension(dimension: number) {
+  getByDimension(dimension: string): Promise<BootInterface[]> {
     return this.boot.findMany({
       where: {
         dimensions: { has: dimension },
@@ -40,8 +51,8 @@ export class PrismaService extends PrismaClient {
     });
   }
 
-  async editName(id: number, body: EditNameDto) {
-    const data = await this.getOne(id);
+  async editName(id: number, body: EditNameDto): Promise<BootInterface> {
+    const data: BootInterface = await this.getOne(id);
 
     if (!data) {
       throw new BadRequestException();

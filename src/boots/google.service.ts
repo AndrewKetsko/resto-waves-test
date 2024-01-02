@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { BootInterface } from './interfaces/boot.interface';
 
 export const enums = {
   Імя: 'name',
@@ -10,7 +11,6 @@ export const enums = {
 
 @Injectable()
 export class GoogleService {
-  private list: any[] = [];
   constructor(private prismaService: PrismaService) {}
 
   async getSpreadsheetsFirst() {
@@ -19,19 +19,18 @@ export class GoogleService {
     });
 
     await doc.loadInfo();
-    const list = [];
+    const list: BootInterface[] = [];
     doc.sheetsByIndex.map(async (sheet, ind, arr) => {
-      const dataArr = async () => await sheet.getCellsInRange('A4:K30');
-      const data = await dataArr();
-      data.splice(3, 1);
+      const dataArr = await sheet.getCellsInRange('A4:K30');
+      dataArr.splice(3, 1);
 
-      for (let i = 1; i < data[0].length; i++) {
+      for (let i = 1; i < dataArr[0].length; i++) {
         const element: any = {};
         element.model = sheet.title;
         element.dimensions = [];
-        data.forEach((el: any) => {
+        dataArr.forEach((el: any) => {
           if (typeof +el[0] === 'number' && !isNaN(+el[0])) {
-            if (el[i] === '+') element.dimensions.push(+el[0]);
+            if (el[i] === '+') element.dimensions.push(el[0]);
           } else {
             element[enums[el[0].trim()]] = el[i];
           }

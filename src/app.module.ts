@@ -1,9 +1,8 @@
-import { Module, ValidationPipe } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ScheduleModule } from '@nestjs/schedule';
 import { BootsModule } from './boots/boots.module';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module';
-import { APP_PIPE } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -16,8 +15,6 @@ import { APP_PIPE } from '@nestjs/core';
     PrismaModule,
   ],
   controllers: [],
-  providers: [
-    { provide: APP_PIPE, useValue: new ValidationPipe({ whitelist: true }) },
-  ],
+  providers: [],
 })
 export class AppModule {}

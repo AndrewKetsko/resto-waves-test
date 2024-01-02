@@ -11,8 +11,8 @@ model Boot{
     id Int @id @default(autoincrement())
 
     model String
-    name String
+    name String @unique
     price String
     code String
-    dimensions Int[]
+    dimensions String[]
 }

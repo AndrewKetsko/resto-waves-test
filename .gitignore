@@ -2,8 +2,8 @@
 /dist
 /node_modules
 credentials.json
-token.json
 .env
+token.json
 
 # Logs
 logs
@@ -36,3 +36,4 @@ lerna-debug.log*
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
